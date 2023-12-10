@@ -5,18 +5,27 @@ defmodule WebInterface do
   plug :dispatch
 
   get "/get/:bucket/:key" do
-    try do
-      val = GenServer.call(String.to_atom(bucket), {:get, String.to_atom(key)})
-      send_resp(conn, 200, "#{val}")
-    rescue
-      RuntimeError -> send_resp(conn, 404, "Resource not found")
-    end
+    bucket_id = String.to_atom(bucket)
+    case GenServer.whereis(bucket_id) do
+      nil ->
+        send_resp(conn, 404, "Resource not found")
+      pid ->
+        val = GenServer.call(pid, {:get, String.to_atom(key)})
+        send_resp(conn, 200, "#{val}")
+      end
   end
 
   post "/set/:bucket/:key" do
     {:ok, v, _} = Plug.Conn.read_body(conn)
-    val = GenServer.cast(String.to_atom(bucket), {:put, String.to_atom(key), v})
-    send_resp(conn, 200, "ok")
+    bucket_id = String.to_atom(bucket)
+
+    case GenServer.whereis(bucket_id) do
+      nil ->
+        send_resp(conn, 404, "Resource not found")
+      pid ->
+        GenServer.cast(pid, {:put, String.to_atom(key), v})
+        send_resp(conn, 200, "ok")
+    end
   end
 
   match _ do
