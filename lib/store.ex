@@ -12,9 +12,7 @@ defmodule Store do
 
   @impl true
   def handle_call({:get, key}, _from, state) do
-    IO.inspect state
     val = Map.get(state, key)
-    IO.inspect val
     {:reply, val, state}
   end
 
