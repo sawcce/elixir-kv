@@ -6,6 +6,7 @@ defmodule WebInterface do
 
   get "/get/:bucket/:key" do
     bucket_id = String.to_atom(bucket)
+
     case GenServer.whereis(bucket_id) do
       nil ->
         send_resp(conn, 404, "Resource not found")
