@@ -5,8 +5,12 @@ defmodule WebInterface do
   plug :dispatch
 
   get "/get/:bucket/:key" do
-    val = GenServer.call(String.to_atom(bucket), {:get, String.to_atom(key)})
-    send_resp(conn, 200, "#{val}")
+    try do
+      val = GenServer.call(String.to_atom(bucket), {:get, String.to_atom(key)})
+      send_resp(conn, 200, "#{val}")
+    rescue
+      RuntimeError -> send_resp(conn, 404, "Resource not found")
+    end
   end
 
   post "/set/:bucket/:key" do
