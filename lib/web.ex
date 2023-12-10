@@ -22,7 +22,9 @@ defmodule WebInterface do
 
     case GenServer.whereis(bucket_id) do
       nil ->
-        send_resp(conn, 404, "Resource not found")
+        GenServer.call(BucketManager, {:create, bucket})
+        GenServer.cast(bucket_id, {:put, String.to_atom(key), v})
+        send_resp(conn, 200, "ok, bucket created")
       pid ->
         GenServer.cast(pid, {:put, String.to_atom(key), v})
         send_resp(conn, 200, "ok")

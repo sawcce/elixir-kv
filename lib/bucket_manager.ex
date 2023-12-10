@@ -12,7 +12,6 @@ defmodule BucketManager do
 
   @impl true
   def handle_call({:create, name}, _from, pid) do
-    IO.inspect name
     DynamicSupervisor.start_child(pid, {Store, name})
     {:reply, :ok, pid}
   end
