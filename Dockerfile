@@ -16,6 +16,6 @@ ARG mix_env=prod
 ENV MIX_ENV=${mix_env}
 COPY --from=builder /app /app
 WORKDIR /app
-EXPORT 4000
+EXPOSE 4000
 ENTRYPOINT ["/app/bin/att"]
 CMD ["start"]
